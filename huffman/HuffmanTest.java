@@ -6,6 +6,7 @@ public class HuffmanTest
 {
 	public static void main (String[] args)
 	{
+		/* Finds the bitcodes for a frequency table */
 		int[] freq = new int[256];
 		freq['A'] = 12;		freq['E'] = 28;
 		freq['B'] = 7;		freq['F'] = 9;
@@ -20,6 +21,8 @@ public class HuffmanTest
 		
 		System.out.println ("\n===================\n");
 		
+		/* Shows how much the text would be
+			compressed */
 		String text = "aaaaiiiooaaaaaaiiiiiooooaaaaaaaaiiiiiiiooooooh";
 		freq = Huffman.frequency (text);
 		bitcodes = Huffman.bitcodes(freq);
@@ -36,6 +39,10 @@ public class HuffmanTest
 		System.out.println ("Diff: " + (text.length() - (numBits/8)) + " bytes");
 		
 		System.out.println ("\n===================\n");
+		
+		/* Compresses an URL and saves the 
+			compressed data to file */
+		
 		String url = "http://www.iu.hio.no/~ulfu/appolonius/kap1/3/kap13.html";
 		try (InputStream in = new java.io.BufferedInputStream((new java.net.URL(url)).openStream()))
 		{
@@ -84,16 +91,32 @@ public class HuffmanTest
 		
 		System.out.println ("\n===================\n");
 		
-		String fromUrl = "file:///C:/Users/David/Java/huffman/org.txt";
+		// String fromUrl = "file:///C:/Users/David/Java/huffman/org.txt";
+		String fromUrl = "file:///C:/Users/David/Java/huffman/article.html";
+		
 		try
 		{
+			long t = System.currentTimeMillis();
 			Huffman.compress (fromUrl, "org.huf");
+			System.out.println ("Time Huffman.compress: " + (System.currentTimeMillis() - t) + " ms");
+			
+			/* The LZW Method */
+			System.out.println ("LZW:");
+			t = System.currentTimeMillis();
+			LZW.komprimer (fromUrl, "org.lzw.1.txt");
+			System.out.println ("Time: " + (System.currentTimeMillis() - t) + " ms");
+			
+			System.out.println ("LZW:");
+			t = System.currentTimeMillis();
+			LZW.komprimer2 (fromUrl, "org.lzw.2.txt");
+			System.out.println ("Time: " + (System.currentTimeMillis() - t) + " ms");
 		}
 		catch (IOException e)
 		{
 			System.err.println ( e.getMessage() );
 		}
 		
+		// fromUrl = "file:///C:/Users/David/Java/huffman/org.huf";
 		fromUrl = "file:///C:/Users/David/Java/huffman/org.huf";
 		try
 		{
