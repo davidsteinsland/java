@@ -25,7 +25,14 @@ public class Compression
 		if ( method.equalsIgnoreCase ("lzw"))
 		{
 			t = System.currentTimeMillis();
-			LZW.komprimer2 (args[1], args[2]);
+			LZW.komprimer (args[1], args[2]);
+			t = System.currentTimeMillis() - t;
+			
+			System.out.println ("LZW.komprimer():");
+			System.out.println (t + " ms");
+			
+			t = System.currentTimeMillis();
+			LZW.komprimer2 (args[1], args[2] + ".slow");
 			t = System.currentTimeMillis() - t;
 			
 			System.out.println ("LZW.komprimer2():");

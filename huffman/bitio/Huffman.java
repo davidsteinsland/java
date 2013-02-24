@@ -209,7 +209,7 @@ public class Huffman
 	{
 		int m = 0;               // indeks til største verdi
 		int max = a[0];    // største verdi
-
+		
 		for (int i = 1; i < a.length; i++) 
 			if (a[i] > max)
 			{

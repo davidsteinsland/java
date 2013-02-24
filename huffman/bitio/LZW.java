@@ -79,7 +79,7 @@ public class LZW
 		}
 	}
 
-	public static void komprimer(String fraUrl, String tilFil)
+	public static void komprimerSlow(String fraUrl, String tilFil)
 		throws IOException
 	{
 		int bitformat = 9;
@@ -246,7 +246,7 @@ public class LZW
 		}
 	}
 
-	public static void komprimer2(String fraUrl, String tilFil)
+	public static void komprimer(String fraUrl, String tilFil)
 		throws IOException
 	{
 		int bitformat = 9;
