@@ -29,12 +29,12 @@ import java.io.*;
  * number of bits that can be unread. An unread is illegal after a peek or a
  * skip.
  *
- * Normally it is possible to insert bits to the front of the stream. The method
- * insertSize() tells how many bits that can be inserted.
+ * Normally it is possible to insert bits to the front of the stream.
+ * The method insertSize() tells how many bits that can be inserted.
  * Subsequent to a read, it is always possible to insert as many bits as were
  * read (or a maximum of 25). After an insert the number of bits that can be
- * unread is reduced by the same amount. Let for instance the stream contain the
- * bits 0110010101011. If ten bits are read, that is the bits
+ * unread is reduced by the same amount. Let for instance the stream contain
+ * the bits 0110010101011. If ten bits are read, that is the bits
  * 0110010101, then the stream will, after an insertion of the
  * five bits 11111, look like 11111011. A
  * subsequent unread of five bits, that is 10101, will turn the
@@ -43,7 +43,7 @@ import java.io.*;
  * It should be noticed that BitInputStream is not thread-safe.
  * None of the methods are synchronized.
  *
- * @author Ulf Uttersrud, Oslo and Akershus University College
+ * @author Ulf Uttersrud,  Oslo and Akershus University College of Applied Sciences
  * @version 2.1   01.11.2011
  */
 
@@ -65,8 +65,8 @@ public class BitInputStream extends InputStream
   private int bufSize;
 
   /**
-   * The current position in the byte buffer. This is the index of the next byte
-   * to be fetched from the byte array buf. The index is always
+   * The current position in the byte buffer. This is the index of the next
+   * byte to be fetched from the byte array buf. The index is always
    * in the range 0 through bufSize. An
    * int-variable bits is used as a bit buffer and the byte
    * buffer buf supplies this bit buffer with bits, one byte at a
@@ -91,8 +91,9 @@ public class BitInputStream extends InputStream
   private int bitSize;
 
   /**
-   * The maximal number of bits to unread. It is reset for each read, is reduced
-   * after an unread and is set to 0 after a skip, a peek or a failed read.
+   * The maximal number of bits to unread. It is reset for each read, is
+   * reduced after an unread and is set to 0 after a skip, a peek or
+   * a failed read.
    */
   private int unreadSize;
 
@@ -103,8 +104,8 @@ public class BitInputStream extends InputStream
 
   /**
    * Fills the byte buffer with data from the underlying stream. The number of
-   * bytes may be less than the capacity of the byte buffer if there are too few
-   * bytes left in the underlying stream. bufSize is set to the
+   * bytes may be less than the capacity of the byte buffer if there are too
+   *  few bytes left in the underlying stream. bufSize is set to the
    * number of bytes read or to -1 if the end of the stream will
    * be or has been reached.
    *
@@ -189,8 +190,9 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Creates a BitInputStream from a file, with the filename as
-   * argument. A default value is used as the length of the internal byte array.
+   * Creates a BitInputStream from a file, with the filename
+   * as argument. A default value is used as the length of
+   * the internal byte array.
    *
    * @param fileName
    *          the name of the file.
@@ -204,13 +206,15 @@ public class BitInputStream extends InputStream
 
   /**
    * A factory method that creates a BitInputStream from a file,
-   * with the filename as argument. A default value is used as the length of the
-   * internal byte array.
+   * with the filename as argument. A default value is used as the length of
+   *  the internal byte array.
    *
    * @param fileName
    *          the name of the file.
    * @exception FileNotFoundException
    *              if the file does not exist.
+   * @return
+   *          the created BitInputStream
    */
   public static BitInputStream fromFile(String fileName)
       throws FileNotFoundException
@@ -227,6 +231,8 @@ public class BitInputStream extends InputStream
    *          the byte array.
    * @exception NullPointerException
    *              if the byte array does not exist.
+   * @return
+   *          the created BitInputStream
    */
   public static BitInputStream fromByteArray(byte[] b)
   {
@@ -239,9 +245,9 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Returns the number of bits that can be read from this input stream. That is
-   * the sum of the number of bits left in the bit buffer, the bytes left in the
-   * byte buffer times 8 and the result of calling the available
+   * Returns the number of bits that can be read from this input stream. That
+   * is the sum of the number of bits left in the bit buffer, the bytes left
+   *  in the byte buffer times 8 and the result of calling the available
    * method of the underlying input stream times 8. The method is relatively
    * costly and should not be used for loop control.
    *
@@ -249,6 +255,7 @@ public class BitInputStream extends InputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
+  @Override
   public int available() throws IOException
   {
     if (in == null)
@@ -270,6 +277,7 @@ public class BitInputStream extends InputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
+  @Override
   public int read() throws IOException
   {
     unreadSize = 8; // the maximal number of bits to be unread
@@ -334,20 +342,21 @@ public class BitInputStream extends InputStream
    * are less than the requested number of bits in the stream. If a
    * -1 is returned, then the method available()
    * will give the exact number (0 or more) of bits left in the stream.
-   * 
+   *
 
    * An IllegalArgumentException is thrown if the requested number of bits is
    * outside the interval [0,31].
    *
    * @param numberOfBits
    *          the requested number of bits to be read.
-   * @return the requested bits, or -1 if there are less than the
-   *         requested number of bits left in the stream.
+   * @return  the requested bits, or -1 if there are less than the
+   *          requested number of bits left in the stream. *
    * @exception IOException
-   *              if an I/O error occurs.
+   *          if an I/O error occurs.
    * @exception IllegalArgumentException
-   *              if numberOfBits is outside the interval [0,31]
+   *          if numberOfBits is outside the interval [0,31]
    */
+
   public int readBits(int numberOfBits) throws IOException
   {
     if (numberOfBits < 0)
@@ -516,15 +525,15 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Reads the next bit in the stream without removing it. The method returns 0
-   * if the next bit is a 0-bit and 1 if the next bit is a 1-bit. The value -1
-   * is returned if there are no more bits (the end of the stream will be or has
-   * been reached).
+   * Reads the next bit in the stream without removing it. The method returns
+   * 0 if the next bit is a 0-bit and 1 if the next bit is a 1-bit. The value
+   * -1 is returned if there are no more bits (the end of the stream will be
+   * or has been reached).
    *
-   * @return 0 or 1 depending on whether the next bit is a 0-bit or a 1-bit, and
-   *         -1 if there are no more bits in the stream.
+   * @return 0 or 1 depending on whether the next bit is a 0-bit or a 1-bit,
+   *         and -1 if there are no more bits in the stream.
    * @exception IOException
-   *              if an I/O error occurs.
+   *         if an I/O error occurs.
    */
   public int peekBit() throws IOException
   {
@@ -553,21 +562,23 @@ public class BitInputStream extends InputStream
    * stream. If a -1 is returned, then the method
    * available() will give the exact number (0 or more) of bits
    * left in the stream.
-   * 
-
+   *
 
    * An IllegalArgumentException is thrown if the requested number of bits is
    * outside the interval [0,31].
    *
    * @param numberOfBits
-   *          the requested number of bits to be peeked.
-   * @return the requested number of bits, or -1 if there are less than the
-   *         requested number of bits left in the stream.
+   *         the requested number of bits to be peeked.
+   * @return
+   *         the requested number of bits, or -1 if there
+   *         are less than the requested number of bits
+   *         left in the stream.
    * @exception IOException
-   *              if an I/O error occurs.
+   *         if an I/O error occurs.
    * @exception IllegalArgumentException
-   *              if numberOfBits is outside the interval [0,31]
+   *         if numberOfBits is outside the interval [0,31]
    */
+
   public int peekBits(int numberOfBits) throws IOException
   {
     if (numberOfBits < 0)
@@ -709,6 +720,7 @@ public class BitInputStream extends InputStream
    * in these circumstances.
    */
 
+  @Override
   public long skip(long n) throws IOException
   {
     throw new UnsupportedOperationException();
@@ -744,11 +756,11 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Skips over and discards a requested number of bits in the input stream. A
-   * skip may (if end of stream will be reached) end up skipping over fewer than
-   * the requested number. However, the method will always return the actual
-   * number of bits skipped (0 if end of stream has been reached). If
-   * numberOfBits is negative, no bits are skipped.
+   * Skips over and discards a requested number of bits in the input stream.
+   * A skip may (if end of stream will be reached) end up skipping over fewer
+   * than the requested number. However, the method will always return
+   * the actual number of bits skipped (0 if end of stream has been reached).
+   * If numberOfBits is negative, no bits are skipped.
    *
    * @param numberOfBits
    *          the number of bits to be skipped.
@@ -858,29 +870,28 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Unreads (pushes back) the requested number of the most recently read bits.
-   * After a read all or some (the most recently) of the read bits can be unread
-   * (pushed back) to the front of the stream. If less than or equal to 25 bits
-   * were read, than all of them can be unread. If more than 25 bits were read,
-   * than at least 25 of them, may be more, can be unread. Two or more
-   * subsequent calls to an unread are allowed if their "sum" does not exceed
-   * the number of bits read by the most recent read. An IllegalStateException
-   * is thrown if there are fewer then the requested number of bits that can be
-   * unread.
-   * 
-
-
+   * Unreads (pushes back) the requested number of the most recently read
+   * bits. After a read all or some (the most recently) of the read bits
+   * can be unread (pushed back) to the front of the stream. If less than
+   * or equal to 25 bits were read, than all of them can be unread.
+   * If more than 25 bits were read, than at least 25 of them, may be more,
+   * can be unread. Two or more subsequent calls to an unread are allowed
+   * if their "sum" does not exceed the number of bits read by the most
+   * recent read. An IllegalStateException is thrown if there are fewer
+   * then the requested number of bits that can be unread.
+   *
    * The method unreadSize() tells at each time how many more
    * bits that can be unread. No bits can be unread after a peek or a skip.
    *
    * @param numberOfBits
-   *          the requested number of bits to be unread.
+   *         the requested number of bits to be unread.
    * @exception IllegalArgumentException
-   *              if there are fewer than the requested number of bits to be
-   *              unread.
+   *         if there are fewer than the requested number
+   *         of bits to be unread.
    * @exception IOException
-   *              if an I/O error occurs.
+   *         if an I/O error occurs.
    */
+
   public void unreadBits(int numberOfBits) throws IOException
   {
     if (in == null)
@@ -894,10 +905,10 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Returns the maximal number of bits that can be unread to the stream at that
-   * moment. This number is reset to the number of bits read for each call to
-   * readBit(), readBits() and read(). However, if more than 25 bits were read,
-   * it might happen that this maximal number is set reset to 25.
+   * Returns the maximal number of bits that can be unread to the stream at
+   * that moment. This number is reset to the number of bits read for each
+   * call toreadBit(), readBits() and read(). However, if more than 25 bits
+   *  were read, it might happen that this maximal number is set reset to 25.
    *
    * @return at each time the maximal number of bits that can be unread to the
    *         stream
@@ -914,9 +925,10 @@ public class BitInputStream extends InputStream
 
   /**
    * Inserts the last bit of bit into the front of the stream. An
-   * IllegalStateException is thrown if no more bits can be inserted. The method
-   * insertSize() reports the number of bits that can be inserted. If a bit is
-   * inserted, the number of bits that can be unread is reduced by one.
+   * IllegalStateException is thrown if no more bits can be inserted.
+   * The method insertSize() reports the number of bits that can be
+   * inserted. If a bit is inserted, the number of bits that can
+   * be unread is reduced by one.
    *
    * @param bit
    *          containing the bit
@@ -942,10 +954,10 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Inserts a 0-bit into the front of the stream. An IllegalStateException is
-   * thrown if no more bits can be inserted. The method insertSize() reports the
-   * number of bits that can be inserted. If a bit is inserted, the number of
-   * bits that can be unread is reduced by one.
+   * Inserts a 0-bit into the front of the stream. An IllegalStateException
+   * is thrown if no more bits can be inserted. The method insertSize()
+   * reports the number of bits that can be inserted. If a bit is inserted,
+   * the number of bits that can be unread is reduced by one.
    *
    * @exception IllegalStateException
    *              if no more bits can be inserted.
@@ -968,10 +980,10 @@ public class BitInputStream extends InputStream
   }
 
   /**
-   * Inserts a 1-bit into the front of the stream. An IllegalStateException is
-   * thrown if no more bits can be inserted. The method insertSize() reports the
-   * number of bits that can be inserted. If a bit is inserted, the number of
-   * bits that can be unread is reduced by one.
+   * Inserts a 1-bit into the front of the stream. An IllegalStateException
+   * is thrown if no more bits can be inserted. The method insertSize()
+   * reports the number of bits that can be inserted. If a bit is inserted,
+   * the number of bits that can be unread is reduced by one.
    *
    * @exception IllegalStateException
    *              if no more bits can be inserted.
@@ -1064,8 +1076,10 @@ public class BitInputStream extends InputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
-  protected void finalize() throws IOException
+  @Override
+  protected void finalize() throws Throwable
   {
+    super.finalize();
     if (in != null)
       close();
   }
@@ -1078,6 +1092,7 @@ public class BitInputStream extends InputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
+  @Override
   public void close() throws IOException
   {
     // a second call to close will have no effect

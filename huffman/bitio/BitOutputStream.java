@@ -1,6 +1,9 @@
 package bitio;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * A BitOutputStream is a buffered stream designed to write an arbitrary
@@ -12,11 +15,12 @@ import java.io.*;
  * Since BitOutputStream is already buffered, there is no need for
  * a BufferedOutputStream.
  *
- * It should be noticed that BitOutputStream is not thread-safe. None of
+ * It should be noticed that BitInputStream is not thread-safe. None of
  * the methods are synchronized.
  *
  * @author Ulf Uttersrud, Oslo and Akershus University College
- * @version 2.1  01.11.2011
+ *                        of Applied Sciences
+ * @version 2.2  28.02.2013
  */
 
 public class BitOutputStream extends OutputStream
@@ -104,6 +108,8 @@ public class BitOutputStream extends OutputStream
    *
    * @param fileName
    *          the name of the file.
+   * @param size
+   *          the length of the internal byte array.
    * @exception FileNotFoundException
    *              if the file does not exist.
    * @exception IllegalArgumentException
@@ -131,13 +137,15 @@ public class BitOutputStream extends OutputStream
   }
 
   /**
-   * A factory method that creates and returns a BitOutputStream with
+   * A method that creates and returns a BitOutputStream with
    * the specified file name and a default value as a buffer length.
    *
    * @param fileName
    *          the name of the file.
    * @exception FileNotFoundException
-   *              if the file can not be created.
+   *          if the file can not be created.
+   * @return
+   *          the created BitOutputStream
    */
   public static BitOutputStream toFile(String fileName)
       throws FileNotFoundException
@@ -158,6 +166,8 @@ public class BitOutputStream extends OutputStream
    *          than the beginning.
    * @exception FileNotFoundException
    *              if the file cannot be created or opened.
+   * @return
+   *          the created BitOutputStream
    */
   public static BitOutputStream toFile(String fileName, boolean append)
       throws FileNotFoundException
@@ -258,6 +268,7 @@ public class BitOutputStream extends OutputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
+  @Override
   public void write(int b) throws IOException
   {
     bits <<= 8;          // 8 bits can now be added
@@ -410,6 +421,100 @@ public class BitOutputStream extends OutputStream
 
   } // end writeBits
 
+  /**
+   * Writes the requested (leftmost) numberOfBits from the argument value to
+   * the output stream. An IllegalArgumentException is thrown if the requested
+   * number of bits is outside the range [0,32]. No bits are written if
+   * numberOfBits is equal to 0.
+   *
+   * @param value
+   *          containing the bits
+   * @param numberOfBits
+   *          the (leftmost) number of bits from value to be written
+   * @exception IOException
+   *              if an I/O error occurs.
+   * @exception IllegalArgumentException
+   *              if numberOfBits is outside the range [0,32]
+   */
+  public void writeLeftBits(int value, int numberOfBits) throws IOException
+  {
+    if (numberOfBits < 0)
+      throw new IllegalArgumentException("Cannot write  a negative ("
+        + numberOfBits + ") number of bits!");
+
+    if (numberOfBits <= 25)   // the most common case
+    {
+      bits <<= numberOfBits;  // will not create overflow
+
+      bits |= (value >>> (32 - numberOfBits));  // the bits are added
+      bitSize += numberOfBits;  // the bitsize is updated
+
+      while (bitSize >= 8)
+      {
+        bitSize -= 8;
+
+        // the byte buffer is flushed if it is full
+        if (pos >= bufSize) flushBuffer();
+
+        buf[pos++] = (byte) (bits >> bitSize);  // a byte is moved
+      }
+    }
+    else if (numberOfBits <= 32)
+    {
+      bits <<= 25;                        // 25 bits can now be added
+      bits |= (value >>> 7);              // 25 bits are added
+      bitSize += 25;                      // bitSize is updated
+
+      // the bit buffer contains at least 25 bits,
+      // 24 of them are moved to the byte buffer
+
+      bitSize -= 8;
+      if (pos >= bufSize) flushBuffer();
+      buf[pos++] = (byte) (bits >> bitSize);
+
+      bitSize -= 8;
+      if (pos >= bufSize) flushBuffer();
+      buf[pos++] = (byte) (bits >> bitSize);
+
+      bitSize -= 8;
+      if (pos >= bufSize) flushBuffer();
+      buf[pos++] = (byte) (bits >> bitSize);
+
+      int k = numberOfBits - 25;        // 1 <= k <= 7
+      bits <<= k;                       // the missing k bits can now be added
+      bits |= ((value >>> (32 - numberOfBits)) & ((1 << k) - 1));
+      bitSize += k;                     // bitSize is updated
+
+      if (bitSize >= 8)                 // 2 <= bitSize <= 15
+      {
+        bitSize -= 8;
+        if (pos >= bufSize) flushBuffer();
+        buf[pos++] = (byte) (bits >> bitSize);  // a byte is moved
+      }
+    }
+    else
+      throw new IllegalArgumentException("Cannot write " + numberOfBits
+          + " bits!");
+
+  } // end writeBits 
+
+  /**
+   * Writes the leftmost significant bits of the argument value (the bits
+   * to the left of the trailing zeros) to the output stream. If value is
+   * equal to 0, nothing is written.
+   *
+   * @param value
+   *          containing the bits
+   * @param numberOfBits
+   *          the (leftmost) number of bits from value to be written
+   * @exception IOException
+   *              if an I/O error occurs.
+   */
+  public void writeLeftBits(int value) throws IOException
+  {
+    writeLeftBits(value, 32 - Integer.numberOfTrailingZeros(value));
+
+  } // end writeBits 
 
   /**
    * Flushes this buffered output stream. This forces any buffered output
@@ -420,6 +525,7 @@ public class BitOutputStream extends OutputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
+  @Override
   public void flush() throws IOException
   {
     if (bitSize > 0)
@@ -442,6 +548,9 @@ public class BitOutputStream extends OutputStream
    * If the method is called previous to a close (or a flush), the return
    * value tells how many 0-bits are shifted into the last byte.
    *
+   * @throws IOException
+   *              if an I/O error occurs.
+   *
    * @return the number of bits missing in order to fill the last byte.
    */
   public int missingBits() throws IOException
@@ -458,8 +567,10 @@ public class BitOutputStream extends OutputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
-  protected void finalize() throws IOException
+  @Override
+  protected void finalize() throws Throwable
   {
+    super.finalize();
     if (out != null)
       close();
   }
@@ -474,6 +585,7 @@ public class BitOutputStream extends OutputStream
    * @exception IOException
    *              if an I/O error occurs.
    */
+  @Override
   public void close() throws IOException
   {
     // a second call to close will have no effect
