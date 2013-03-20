@@ -21,7 +21,7 @@ public class AdHuffman     // adaptiv Huffman
     private int nummer;                    // nodens nummer
     private Node forelder;                 // peker til forelder
     private Node venstre = null;           // peker til venstre barn
-    private Node hÃ¸yre = null;             // peker til hÃ¸yre barn
+    private Node høyre = null;             // peker til høyre barn
 
     private Node(int frekvens, int c, int nummer, Node forelder)
     {
@@ -50,7 +50,7 @@ public class AdHuffman     // adaptiv Huffman
   private Node[] tegn;            // nodetabell for tegn
   int antall = 0;                 // antall noder i treet
 
-  public AdHuffman()              // kontruktÃ¸r - lager et tomt tre
+  public AdHuffman()              // kontruktør - lager et tomt tre
   {
     rot = NULL = new Node(0, -1, 0, null);   // rotnoden er lik nullnoden
     noder = new Node[2 * 8 + 1];             // plass til 17 noder (8 tegn)
@@ -62,14 +62,14 @@ public class AdHuffman     // adaptiv Huffman
   {
     Node f = p.forelder, g = q.forelder;  // finner foreldrene
 
-    if (p == f.venstre) f.venstre = q;    // f fÃ¥r q som barn
-    else f.hÃ¸yre = q;
+    if (p == f.venstre) f.venstre = q;    // f får q som barn
+    else f.høyre = q;
 
-    if (q == g.hÃ¸yre) g.hÃ¸yre = p;        // g fÃ¥r p som barn
+    if (q == g.høyre) g.høyre = p;        // g får p som barn
     else g.venstre = p;
 
-    p.forelder = g;                // p fÃ¥r g som forelder
-    q.forelder = f;                // q fÃ¥r f som forelder
+    p.forelder = g;                // p får g som forelder
+    q.forelder = f;                // q får f som forelder
 
     noder[q.nummer] = p;           // p flyttes til plassen til q
     noder[p.nummer] = q;           // q flyttes til plasen til p
@@ -88,9 +88,9 @@ public class AdHuffman     // adaptiv Huffman
 
     Node p = NULL;                          // p settes lik nullnoden
 
-    p.hÃ¸yre = new Node(1,c,antall,p);       // ny node som hÃ¸yre barn
-    tegn[c] = p.hÃ¸yre;                      // noden inn i tegn-tabellen
-    noder[antall++] = p.hÃ¸yre;              // noden inn i nodetabellen
+    p.høyre = new Node(1,c,antall,p);       // ny node som høyre barn
+    tegn[c] = p.høyre;                      // noden inn i tegn-tabellen
+    noder[antall++] = p.høyre;              // noden inn i nodetabellen
 
     p.venstre = new Node(0,-1,antall,p);    // ny node som venstre barn
     noder[antall++] = p.venstre;            // noden inn i nodetabellen
@@ -105,10 +105,10 @@ public class AdHuffman     // adaptiv Huffman
 
   private void oppdater(int c)
   {
-    Node p = tegn[c];                  // slÃ¥r opp i tegntabellen
+    Node p = tegn[c];                  // slår opp i tegntabellen
     if (p == null) p = nyttTegn(c);    // er det et nytt tegn?
 
-    while (p != rot)                   // gÃ¥r fra p og opp mot roten
+    while (p != rot)                   // går fra p og opp mot roten
     {
       // sammenligner p med noden rett foran
       if (noder[p.nummer - 1].frekvens == p.frekvens)
@@ -120,8 +120,8 @@ public class AdHuffman     // adaptiv Huffman
         if (q != p.forelder) bytt(p,q,noder);   // p og q bytter plass
       }
 
-      p.frekvens++;                             // Ã¸ker frekvensen
-      p = p.forelder;                           // gÃ¥r til forelderen
+      p.frekvens++;                             // øker frekvensen
+      p = p.forelder;                           // går til forelderen
     }
   }
 
@@ -129,7 +129,7 @@ public class AdHuffman     // adaptiv Huffman
   {
     AdHuffman h = new AdHuffman();             // lager et tomt tre
 
-    char[] tegn = melding.toCharArray();       // gjÃ¸r om til en tegntabell
+    char[] tegn = melding.toCharArray();       // gjør om til en tegntabell
     for (char c : tegn) h.oppdater(c);         // bygger opp treet
 
     for (int i = 0; i < h.antall; i++)         // skriver ut nodene
@@ -143,11 +143,11 @@ public class AdHuffman     // adaptiv Huffman
 
     Node p = blad != null ? blad : NULL;  // p tegnnode eller nullnoden
 
-    while (p != rot)    // gÃ¥r oppover mot roten
+    while (p != rot)    // går oppover mot roten
     {
       lengde++;
       biter >>>= 1;
-      if (p.forelder.hÃ¸yre == p) biter |= 0x80000000;
+      if (p.forelder.høyre == p) biter |= 0x80000000;
       p = p.forelder;
     }
 
@@ -195,7 +195,7 @@ public class AdHuffman     // adaptiv Huffman
         if (inn.readBit() == 0)
           p = p.venstre;                   // til venstre ved 0-bit
         else
-          p = p.hÃ¸yre;                     // til hÃ¸yre ved 1-bit
+          p = p.høyre;                     // til høyre ved 1-bit
       }
 
       int c = p.c;                         // tegnet i noden

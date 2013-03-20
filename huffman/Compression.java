@@ -30,18 +30,11 @@ public class Compression
 			
 			System.out.println ("LZW.komprimer():");
 			System.out.println (t + " ms");
-			
-			t = System.currentTimeMillis();
-			LZW.komprimer2 (args[1], args[2] + ".slow");
-			t = System.currentTimeMillis() - t;
-			
-			System.out.println ("LZW.komprimer2():");
-			System.out.println (t + " ms");
 		}
 		else
 		{
 			t = System.currentTimeMillis();
-			Huffman.compress (args[1], args[2]);
+			Huffman.komprimer (args[1], args[2]);
 			t = System.currentTimeMillis() - t;
 			
 			System.out.println ("Huffman.compress():");
